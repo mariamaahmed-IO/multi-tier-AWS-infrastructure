@@ -1,0 +1,22 @@
+# Private SSH keys - NEVER commit
+*.pem
+utc-dev-key
+utc-dev-key.pub
+
+# Terraform state - managed remotely in S3
+*.tfstate
+*.tfstate.backup
+
+# Terraform working directory
+**/.terraform/
+*.lock.hcl
+
+# Sensitive variable files
+*.tfvars
+
+# Plan files
+*.tfplan
+tfplan
+
+# Mac system files
+.DS_Store
