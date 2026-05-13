@@ -5,7 +5,7 @@ resource "aws_iam_openid_connect_provider" "github" {
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }
 
-# Plan role - read only, any PR can use this
+# Plan role - for PRs, any branch
 resource "aws_iam_role" "github_actions_plan" {
   name = "github-actions-plan-role"
 
@@ -51,13 +51,62 @@ resource "aws_iam_role" "github_actions_apply" {
   })
 }
 
-# Plan role permissions - currently ReadOnlyAccess (about to fix this)
+# Custom policy for plan role
+# Fixes the DynamoDB AccessDenied error
+resource "aws_iam_policy" "plan_permissions" {
+  name = "github-actions-plan-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem"
+        ]
+        Resource = "arn:aws:dynamodb:us-east-1:173036476311:table/utc-terraform-locks"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::utc-terraform-state-dev",
+          "arn:aws:s3:::utc-terraform-state-dev/*"
+        ]
+      },
+      {
+        Effect  = "Allow"
+        Action  = ["*"]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "iam:ResourceTag/ReadOnly" = "true"
+          }
+        }
+      }
+    ]
+  })
+}
+
+# Attach ReadOnlyAccess for describing AWS resources
 resource "aws_iam_role_policy_attachment" "plan_readonly" {
   role       = aws_iam_role.github_actions_plan.name
   policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
 }
 
-# Apply role permissions - full admin
+# Attach custom policy that adds DynamoDB + S3 write for state
+resource "aws_iam_role_policy_attachment" "plan_custom" {
+  role       = aws_iam_role.github_actions_plan.name
+  policy_arn = aws_iam_policy.plan_permissions.arn
+}
+
+# Apply role - full admin
 resource "aws_iam_role_policy_attachment" "apply_admin" {
   role       = aws_iam_role.github_actions_apply.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
