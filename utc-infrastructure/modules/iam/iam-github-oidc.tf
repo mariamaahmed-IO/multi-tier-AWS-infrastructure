@@ -1,9 +1,11 @@
+# OIDC provider - tells AWS to trust GitHub
 resource "aws_iam_openid_connect_provider" "github" {
   url             = "https://token.actions.githubusercontent.com"
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
 }
-# Role for PR workflow - read only
+
+# Plan role - read only, any PR can use this
 resource "aws_iam_role" "github_actions_plan" {
   name = "github-actions-plan-role"
 
@@ -27,6 +29,7 @@ resource "aws_iam_role" "github_actions_plan" {
   })
 }
 
+# Apply role - full access, main branch only
 resource "aws_iam_role" "github_actions_apply" {
   name = "github-actions-apply-role"
 
@@ -48,16 +51,19 @@ resource "aws_iam_role" "github_actions_apply" {
   })
 }
 
+# Plan role permissions - currently ReadOnlyAccess (about to fix this)
 resource "aws_iam_role_policy_attachment" "plan_readonly" {
   role       = aws_iam_role.github_actions_plan.name
   policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
 }
 
+# Apply role permissions - full admin
 resource "aws_iam_role_policy_attachment" "apply_admin" {
   role       = aws_iam_role.github_actions_apply.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
+# Outputs
 output "github_actions_plan_role_arn" {
   value       = aws_iam_role.github_actions_plan.arn
   description = "Add to GitHub Secrets as AWS_ROLE_ARN"
