@@ -84,3 +84,12 @@ output "asg_name" {
   description = "Auto Scaling Group name"
   value       = module.asg.asg_name
 }
+output "github_actions_plan_role_arn" {
+  value       = module.iam.github_actions_plan_role_arn
+  description = "Add to GitHub Secrets as AWS_ROLE_ARN"
+}
+
+output "github_actions_apply_role_arn" {
+  value       = module.iam.github_actions_apply_role_arn
+  description = "Add to GitHub Secrets as AWS_ROLE_ARN_APPLY"
+}
