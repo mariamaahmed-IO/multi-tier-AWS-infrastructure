@@ -104,3 +104,18 @@ module "asg" {
     scale_out_cpu = 80
   
 }
+module "eks" {
+    source = "./modules/eks"
+    cluster_name = "${var.env}-utc-eks-cluster"
+    cluster_version = "1.32"
+    private_subnet_ids = module.vpc.private_subnet_id
+    public_subnet_ids = module.vpc.public_subnet_id
+    vpc_id = module.vpc.vpc_id
+
+    node_group_instance_type = "t3.medium"
+    node_group_min_size = 1
+    node_group_max_size = 5
+    node_group_desired_size = 2
+    env = var.env
+  
+}

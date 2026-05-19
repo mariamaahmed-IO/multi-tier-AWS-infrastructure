@@ -122,3 +122,29 @@ output "github_actions_apply_role_arn" {
   value       = aws_iam_role.github_actions_apply.arn
   description = "Add to GitHub Secrets as AWS_ROLE_ARN_APPLY"
 }
+
+
+resource "aws_iam_policy" "eks_pass_role" {
+  name = "github-actions-eks-pass-role"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "iam:PassRole"
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "iam:PassedToService" = "eks.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "apply_pass_role" {
+  role       = aws_iam_role.github_actions_apply.name
+  policy_arn = aws_iam_policy.eks_pass_role.arn
+}

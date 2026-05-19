@@ -93,3 +93,13 @@ output "github_actions_apply_role_arn" {
   value       = module.iam.github_actions_apply_role_arn
   description = "Add to GitHub Secrets as AWS_ROLE_ARN_APPLY"
 }
+
+output "eks_cluster_name" {
+  value       = module.eks.cluster_name
+  description = "EKS cluster name - used by ArgoCD workflow"
+}
+
+output "eks_cluster_endpoint" {
+  value       = module.eks.cluster_endpoint
+  description = "EKS cluster API endpoint"
+}
