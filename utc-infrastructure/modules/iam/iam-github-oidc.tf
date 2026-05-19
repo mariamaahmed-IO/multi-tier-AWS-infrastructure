@@ -22,7 +22,7 @@ resource "aws_iam_role" "github_actions_plan" {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
         }
         StringLike = {
-          "token.actions.githubusercontent.com:sub" = "repo:mariamaahmed-IO/multi-tier-AWS-infrastructure:pull_request"
+          "token.actions.githubusercontent.com:sub" = "repo:mariamaahmed-IO/multi-tier-AWS-infrastructure:*"
         }
       }
     }]
