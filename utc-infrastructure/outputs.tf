@@ -75,9 +75,9 @@ output "s3_bucket_id" {
 }
 
 output "efs_dns_name" {
-    description = "EFS DNS name for app server mounting"
-    value       = module.efs.efs_dns_name
-  
+  description = "EFS DNS name for app server mounting"
+  value       = module.efs.efs_dns_name
+
 }
 
 output "asg_name" {

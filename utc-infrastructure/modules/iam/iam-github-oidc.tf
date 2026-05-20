@@ -81,8 +81,8 @@ resource "aws_iam_policy" "plan_permissions" {
         ]
       },
       {
-        Effect  = "Allow"
-        Action  = ["*"]
+        Effect   = "Allow"
+        Action   = ["*"]
         Resource = "*"
         Condition = {
           StringEquals = {
@@ -131,8 +131,8 @@ resource "aws_iam_policy" "eks_pass_role" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = "iam:PassRole"
+        Effect   = "Allow"
+        Action   = "iam:PassRole"
         Resource = "*"
         Condition = {
           StringEquals = {
