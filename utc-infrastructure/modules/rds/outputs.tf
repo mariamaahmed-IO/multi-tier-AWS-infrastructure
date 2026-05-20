@@ -11,5 +11,5 @@ output "db_name" {
 output "db_port" {
   description = "Database port"
   value       = aws_db_instance.db_instance.port
-
-}
+  
+  }

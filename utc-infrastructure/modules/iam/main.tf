@@ -19,7 +19,7 @@ resource "aws_iam_role" "ec2_role" {
   tags = {
     Name = "${local.name}-ec2-role"
   }
-
+  
 }
 
 resource "aws_iam_policy" "ec2_s3_policy" {
@@ -34,12 +34,12 @@ resource "aws_iam_policy" "ec2_s3_policy" {
           "s3:GetObject",
           "s3:ListBucket",
           "s3:PutObject",
-          "s3:DeleteObject"
+          "s3:DeleteObject"  
         ]
-        Effect = "Allow"
+        Effect   = "Allow"
         Resource = [
-          var.s3_bucket_arn,
-          "${var.s3_bucket_arn}/*"
+            var.s3_bucket_arn,
+            "${var.s3_bucket_arn}/*"
         ]
       }
     ]
@@ -47,7 +47,7 @@ resource "aws_iam_policy" "ec2_s3_policy" {
   tags = {
     Name = "${local.name}-ec2-s3-policy"
   }
-
+  
 }
 resource "aws_iam_role_policy_attachment" "ec2_role_attachment" {
   role       = aws_iam_role.ec2_role.name
@@ -59,7 +59,7 @@ resource "aws_iam_instance_profile" "ec2_profile" {
   role = aws_iam_role.ec2_role.name
 
   tags = {
-    Name = "${local.name}-ec2-profile"
+    Name="${local.name}-ec2-profile"
   }
-
+  
 }

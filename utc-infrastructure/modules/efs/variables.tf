@@ -23,7 +23,7 @@ variable "vpc_id" {
   type        = string
 }
 variable "azs" {
-  description = "List of availability zones for EFS mount targets"
-  type        = list(string)
-
+    description = "List of availability zones for EFS mount targets"
+    type        = list(string)
+  
 }
