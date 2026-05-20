@@ -1,0 +1,120 @@
+name: Terraform Apply (Production)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "utc-infrastructure/**.tf"
+      - "utc-infrastructure/environments/dev/**.tfvars"
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_VERSION: ${ { secrets.TF_VERSION } }
+  AWS_REGION: ${ { secrets.AWS_REGION } }
+jobs:
+  plan:
+    name: Plan (pre-approval snapshot)
+    runs-on: ubuntu-latest
+    outputs:
+      plan_exit_code: ${{ steps.plan.outputs.exitcode }}
+    defaults:
+      run:
+        working-directory: ./utc-infrastructure
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_APPLY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: true
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform plan
+        id: plan
+        env:
+          TF_VAR_env:         ${{ secrets.TF_VAR_env }}
+          TF_VAR_my_ip:       ${{ secrets.TF_VAR_my_ip }}
+          TF_VAR_ami_id:      ${{ secrets.TF_VAR_ami_id }}
+          TF_VAR_asg_ami_id:  ${{ secrets.TF_VAR_asg_ami_id }}
+          TF_VAR_db_username: ${{ secrets.TF_VAR_db_username }}
+          TF_VAR_db_password: ${{ secrets.TF_VAR_db_password }}
+          TF_VAR_email:       ${{ secrets.TF_VAR_email }}
+        run: terraform plan -detailed-exitcode -no-color -input=false -out=tfplan
+        # exit 0 = no changes, exit 2 = changes present
+
+      - name: Save plan artifact
+        if: steps.plan.outputs.exitcode == '2'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-${{ github.sha }}
+          path: utc-infrastructure/tfplan
+          retention-days: 7
+
+  approve:
+    name: Await manual approval
+    needs: plan
+    if: needs.plan.outputs.plan_exit_code == '2'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Approval checkpoint
+        run: echo "Approved. Proceeding to terraform apply."
+
+  apply:
+    name: Terraform Apply
+    needs: [plan, approve]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./utc-infrastructure
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_APPLY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Download plan artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-${{ github.sha }}
+          path: utc-infrastructure/
+
+      - name: Terraform apply
+        env:
+          TF_VAR_env:         ${{ secrets.TF_VAR_env }}
+          TF_VAR_my_ip:       ${{ secrets.TF_VAR_my_ip }}
+          TF_VAR_ami_id:      ${{ secrets.TF_VAR_ami_id }}
+          TF_VAR_asg_ami_id:  ${{ secrets.TF_VAR_asg_ami_id }}
+          TF_VAR_db_username: ${{ secrets.TF_VAR_db_username }}
+          TF_VAR_db_password: ${{ secrets.TF_VAR_db_password }}
+          TF_VAR_email:       ${{ secrets.TF_VAR_email }}
+        run: terraform apply -auto-approve -input=false tfplan
+
+    
