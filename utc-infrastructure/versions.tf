@@ -31,6 +31,4 @@ provider "aws" {
       project = var.project
     }
   }
-
 }
-
