@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 env:
-  TF_VERSION: ${{ secrets.TF_VERSION }}
+  TF_VERSION: ${{ secrets.TF_VERSION }} #corrected 
   AWS_REGION: ${{ secrets.AWS_REGION }}
 jobs:
   plan:
