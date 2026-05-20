@@ -13,7 +13,7 @@ permissions:
 
 env:
   TF_VERSION: ${ { secrets.TF_VERSION } }
-  AWS_REGION: ${ { secrets.AWS_REGION } }
+  AWS_REGION: ${ { secrets.AWS_REGION } } #added the region
 jobs:
   plan:
     name: Plan (pre-approval snapshot)
