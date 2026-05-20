@@ -7,9 +7,9 @@ resource "aws_launch_template" "lt" {
   name        = "${local.name}-lt"
   description = "Launch template for UTC app servers"
 
-  image_id               = var.ami_id
-  instance_type          = var.instance_type
-  key_name               = var.key_name
+  image_id      = var.ami_id
+  instance_type = var.instance_type
+  key_name      = var.key_name
 
   vpc_security_group_ids = [var.app_sg_id]
 
