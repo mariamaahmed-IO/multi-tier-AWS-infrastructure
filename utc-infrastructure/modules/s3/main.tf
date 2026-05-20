@@ -54,7 +54,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "s3_logs" {
     id     = "archive-old-logs"
     status = "Enabled"
     filter {
-      prefix = ""  # applies to all objects
+      prefix = "" # applies to all objects
     }
 
     transition {

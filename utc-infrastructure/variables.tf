@@ -1,27 +1,27 @@
 variable "aws_region" {
-    description = "The AWS region to deploy resources in."
-    type        = string
-    default     = "us-east-1"
-  
+  description = "The AWS region to deploy resources in."
+  type        = string
+  default     = "us-east-1"
+
 }
 
 variable "env" {
-    description = "The environment for the resources (e.g., dev, staging, prod)."
-    type        = string
+  description = "The environment for the resources (e.g., dev, staging, prod)."
+  type        = string
 }
 
 variable "team" {
-    description = "The team responsible for the resources."
-    type        = string
-    default = "config mangement"
+  description = "The team responsible for the resources."
+  type        = string
+  default     = "config mangement"
 
 }
 
 variable "project" {
-    description = "The project name for the resources."
-    type        = string
-    default = "utc"    
-  
+  description = "The project name for the resources."
+  type        = string
+  default     = "utc"
+
 }
 
 variable "my_ip" {
@@ -31,10 +31,10 @@ variable "my_ip" {
 }
 
 variable "ami_id" {
-    description = "Amazon Linux 2AMI ID for us-east-1 region"
-    type        = string
-   
-  
+  description = "Amazon Linux 2AMI ID for us-east-1 region"
+  type        = string
+
+
 }
 
 variable "db_username" {
@@ -48,13 +48,13 @@ variable "db_password" {
   type        = string
   sensitive   = true
 }
-    
+
 variable "email" {
   description = "Email address for notifications"
   type        = string
 }
 
 variable "asg_ami_id" {
-    description = "AMI ID for Auto Scaling Group instances"
-    type        = string
+  description = "AMI ID for Auto Scaling Group instances"
+  type        = string
 }
